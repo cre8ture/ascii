@@ -1,0 +1,2386 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MONO // GLYPH — Procedural ASCII Stream Masonry</title>
+  <meta
+    name="description"
+    content="MONO // GLYPH by Kai Kleinbard — a monochrome masonry gallery of 20 real-time procedural ASCII and character-streaming animations rendered purely in text buffers."
+  />
+  <meta name="author" content="Kai Kleinbard" />
+  <meta name="creator" content="Kai Kleinbard" />
+  <meta
+    name="keywords"
+    content="ASCII art, procedural ASCII, generative art, monochrome, character streaming, terminal animation, masonry gallery, Kai Kleinbard"
+  />
+  <meta name="theme-color" content="#070708" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://cre8ture.github.io/ascii/" />
+
+  <!-- ASCII Icons -->
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
+
+  <!-- Open Graph / Social Metadata -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="MONO // GLYPH" />
+  <meta property="og:title" content="MONO // GLYPH — Procedural ASCII Stream Masonry" />
+  <meta
+    property="og:description"
+    content="A monochrome masonry gallery of 20 real-time procedural ASCII &amp; character-streaming animations by Kai Kleinbard. Pure text buffers, zero canvas bitmaps."
+  />
+  <meta property="og:url" content="https://cre8ture.github.io/ascii/" />
+  <meta property="og:image" content="https://cre8ture.github.io/ascii/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="MONO // GLYPH — 20 Procedural ASCII Streams by Kai Kleinbard" />
+
+  <!-- Twitter Card Metadata -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="MONO // GLYPH — Procedural ASCII Stream Masonry" />
+  <meta
+    name="twitter:description"
+    content="20 real-time procedural monochrome ASCII character-streaming animations by Kai Kleinbard."
+  />
+  <meta name="twitter:image" content="https://cre8ture.github.io/ascii/og-image.png" />
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "MONO // GLYPH — Procedural ASCII Stream Masonry",
+      "url": "https://cre8ture.github.io/ascii/",
+      "description": "A monochrome masonry gallery of 20 real-time procedural ASCII and character-streaming animations rendered purely in text buffers with inspectable code.",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Any",
+      "author": {
+        "@type": "Person",
+        "name": "Kai Kleinbard",
+        "sameAs": [
+          "https://www.linkedin.com/in/kai-kleinbard/",
+          "https://github.com/cre8ture"
+        ]
+      }
+    }
+  </script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts: Inter for UI, JetBrains Mono for crisp character grids -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    /* Monochromatic Design Tokens */
+    :root {
+      --bg-page: #070708;
+      --bg-card: #0e0e10;
+      --bg-card-hover: #121215;
+      --bg-info: #0b0b0d;
+      --border-subtle: #222226;
+      --border-strong: #3f3f46;
+      --text-primary: #f4f4f5;
+      --text-secondary: #a1a1aa;
+      --text-muted: #52525b;
+      --ascii-bright: #ffffff;
+      --ascii-mid: #a1a1aa;
+      --ascii-dim: #3f3f46;
+      --scrollbar-track: #111114;
+      --scrollbar-thumb: #2e2e34;
+    }
+
+    html.light-mono {
+      --bg-page: #f5f5f5;
+      --bg-card: #ffffff;
+      --bg-card-hover: #fafafa;
+      --bg-info: #fcfcfc;
+      --border-subtle: #e4e4e7;
+      --border-strong: #a1a1aa;
+      --text-primary: #09090b;
+      --text-secondary: #52525b;
+      --text-muted: #a1a1aa;
+      --ascii-bright: #09090b;
+      --ascii-mid: #52525b;
+      --ascii-dim: #d4d4d8;
+      --scrollbar-track: #f4f4f5;
+      --scrollbar-thumb: #d4d4d8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      font-family: 'Inter', system-ui, sans-serif;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Responsive Flex-Column Masonry Layout (guarantees top-row placement) */
+    .masonry-grid {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      width: 100%;
+    }
+
+    .masonry-col {
+      flex: 1 1 0%;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .masonry-item {
+      break-inside: avoid;
+      -webkit-column-break-inside: avoid;
+      margin-bottom: 1rem;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 0.75rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s ease, background-color 0.25s ease, transform 0.2s ease;
+    }
+
+    .masonry-item:hover {
+      border-color: var(--border-strong);
+      background-color: var(--bg-card-hover);
+    }
+
+    /* ASCII Canvas Stage */
+    .ascii-stage {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 2.25rem 0.75rem 1.75rem 0.75rem;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: pan-y;
+    }
+
+    .ascii-stage.interactive-stage {
+      cursor: crosshair;
+      touch-action: none;
+    }
+
+    .ascii-pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(8.5px, 1.05vw, 11.5px);
+      line-height: 1.15;
+      letter-spacing: 0.04em;
+      white-space: pre;
+      color: var(--text-primary);
+      margin: 0;
+      text-align: left;
+    }
+
+    /* Subtle typographic luminance classes for multi-shade ASCII */
+    .c-hi { color: var(--ascii-bright); font-weight: 600; }
+    .c-md { color: var(--ascii-mid); font-weight: 400; }
+    .c-lo { color: var(--ascii-dim); font-weight: 300; }
+
+    /* Info / Code Overlay */
+    .info-panel {
+      position: absolute;
+      inset: 0;
+      background-color: var(--bg-info);
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(6px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .masonry-item.show-info .info-panel {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    /* Top-right 'i' button */
+    .info-btn {
+      position: absolute;
+      top: 0.6rem;
+      right: 0.6rem;
+      z-index: 30;
+      width: 1.85rem;
+      height: 1.85rem;
+      border-radius: 9999px;
+      border: 1px solid var(--border-subtle);
+      background-color: var(--bg-card);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .info-btn:hover,
+    .masonry-item.show-info .info-btn {
+      border-color: var(--text-primary);
+      color: var(--text-primary);
+      background-color: var(--bg-page);
+    }
+
+    /* Minimalist Scrollbar for Code Snippets */
+    .code-scroll::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .code-scroll::-webkit-scrollbar-track {
+      background: var(--scrollbar-track);
+      border-radius: 4px;
+    }
+    .code-scroll::-webkit-scrollbar-thumb {
+      background: var(--scrollbar-thumb);
+      border-radius: 4px;
+    }
+
+    /* Minimal pill button */
+    .mono-btn {
+      border: 1px solid var(--border-subtle);
+      background-color: var(--bg-card);
+      color: var(--text-secondary);
+      transition: all 0.18s ease;
+    }
+    .mono-btn:hover {
+      border-color: var(--text-primary);
+      color: var(--text-primary);
+    }
+
+    /* Minimalist Live Name Input inside First Cell */
+    .name-input-wrap {
+      border-top: 1px solid var(--border-subtle);
+      background-color: var(--bg-page);
+      padding: 0.5rem 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .name-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      color: var(--text-primary);
+      text-transform: uppercase;
+    }
+
+    .name-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* Distinct Minimalist Pill Input Style for Clickable Link Cell */
+    .link-input-wrap {
+      border-top: 1px dashed var(--border-subtle);
+      background-color: var(--bg-card);
+      padding: 0.55rem 0.75rem;
+    }
+
+    .link-input-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.35rem 0.65rem;
+      border-radius: 9999px;
+      border: 1px solid var(--border-subtle);
+      background-color: var(--bg-page);
+      transition: border-color 0.2s ease;
+    }
+
+    .link-input-pill:focus-within {
+      border-color: var(--text-primary);
+    }
+
+    .link-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.02em;
+      color: var(--text-primary);
+    }
+
+    .link-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .ascii-stage.clickable-stage {
+      cursor: pointer;
+    }
+
+    /* Minimalist Attribution Footer Bar (e.g. Ghostty inspiration link) */
+    .attribution-bar {
+      border-top: 1px solid var(--border-subtle);
+      background-color: var(--bg-page);
+      padding: 0.45rem 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .attribution-link {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.18s ease;
+    }
+
+    .attribution-link:hover {
+      color: var(--text-primary);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Minimalist Monochrome Header -->
+  <header class="w-full border-b border-[var(--border-subtle)] sticky top-0 z-40 backdrop-blur-md bg-[var(--bg-page)]/85">
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-2.5 h-2.5 rounded-full bg-[var(--text-primary)] animate-pulse"></div>
+        <h1 class="font-mono text-sm sm:text-base tracking-widest uppercase font-medium">
+          MONO<span class="text-[var(--text-muted)]">//</span>GLYPH
+        </h1>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button
+          id="btn-pause"
+          class="mono-btn font-mono text-xs px-3 py-1.5 rounded-lg flex items-center gap-1.5 cursor-pointer"
+          title="Pause or resume all animations"
+        >
+          <span id="pause-icon">❚❚</span>
+          <span id="pause-label">PAUSE</span>
+        </button>
+
+        <button
+          id="btn-theme"
+          class="mono-btn font-mono text-xs px-3 py-1.5 rounded-lg flex items-center gap-1.5 cursor-pointer"
+          title="Invert monochrome polarity"
+        >
+          <span id="theme-icon">◐</span>
+          <span>INVERT</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Subtle Intro Bar -->
+  <div class="max-w-[1600px] w-full mx-auto px-4 sm:px-6 pt-5 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-[var(--text-secondary)]">
+    <p class="font-mono">
+      Procedural character buffers &amp; repeating terminal streams. Hover interactive cells or click
+      <span class="inline-flex items-center justify-center w-4 h-4 rounded-full border border-[var(--border-strong)] text-[10px] mx-0.5 text-[var(--text-primary)]">i</span>
+      to inspect code.
+    </p>
+    <p id="status-readout" class="font-mono text-[11px] text-[var(--text-muted)]">
+      ACTIVE: 20 / 20
+    </p>
+  </div>
+
+  <!-- Masonry Gallery Container -->
+  <main class="max-w-[1600px] w-full mx-auto px-4 sm:px-6 pb-12 flex-1">
+    <div id="masonry-grid" class="masonry-grid">
+      <!-- Cells are dynamically mounted here -->
+    </div>
+  </main>
+
+  <!-- Minimal Footer -->
+  <footer class="w-full border-t border-[var(--border-subtle)] py-4 px-4 sm:px-6 text-center">
+    <p class="font-mono text-[11px] text-[var(--text-muted)]">
+      PURE MONOCHROME CHARACTER MATRICES &middot; NO CANVAS BITMAPS &middot; 100% TEXT STREAMING
+    </p>
+  </footer>
+
+  <!-- Toast Message Box (replaces alert()) -->
+  <div
+    id="toast"
+    class="fixed bottom-5 right-5 z-50 px-3.5 py-2 rounded-lg border border-[var(--border-strong)] bg-[var(--bg-card)] text-[var(--text-primary)] font-mono text-xs shadow-lg opacity-0 pointer-events-none transition-opacity duration-200"
+  >
+    Copied to clipboard
+  </div>
+
+  <script>
+    /**
+     * MONO // GLYPH — 19 Procedural ASCII & Character-Streaming Effects
+     * All effects render directly into <pre> character buffers at controlled FPS.
+     */
+
+    // =========================================================================
+    // UTILITY HELPERS
+    // =========================================================================
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    /**
+     * Converts a plain ASCII buffer into 3-tier monochrome shaded HTML
+     * (bright highlights, mid-tone structure, dim atmospheric trails),
+     * batching adjacent characters of the same luminance tier for speed.
+     */
+    const HI_CHARS = new Set('@#$%█▓O><^vABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+    const LO_CHARS = new Set('.·:-~░_,');
+
+    function shadeAscii(text) {
+      let html = '';
+      let currentCls = '';
+      let chunk = '';
+
+      const flush = () => {
+        if (!chunk) return;
+        const safe = escapeHtml(chunk);
+        html += currentCls ? `<span class="${currentCls}">${safe}</span>` : safe;
+        chunk = '';
+      };
+
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (ch === '\n' || ch === ' ') {
+          flush();
+          currentCls = '';
+          html += ch;
+          continue;
+        }
+        const cls = HI_CHARS.has(ch) ? 'c-hi' : LO_CHARS.has(ch) ? 'c-lo' : 'c-md';
+        if (cls !== currentCls) {
+          flush();
+          currentCls = cls;
+        }
+        chunk += ch;
+      }
+      flush();
+      return html;
+    }
+
+    let toastTimer = null;
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      if (!toast) return;
+      toast.textContent = message;
+      toast.style.opacity = '1';
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.style.opacity = '0';
+      }, 1800);
+    }
+
+    function copyTextToClipboard(text) {
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        textarea.style.pointerEvents = 'none';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast('Copied algorithm to clipboard');
+      } catch (err) {
+        showToast('Unable to copy');
+      }
+    }
+
+    // =========================================================================
+    // COMPACT 3x5 BITMAP FONT FOR LIVE NAME STREAMER
+    // =========================================================================
+
+    const FONT_3X5 = {
+      A: ['010', '101', '111', '101', '101'],
+      B: ['110', '101', '110', '101', '110'],
+      C: ['011', '100', '100', '100', '011'],
+      D: ['110', '101', '101', '101', '110'],
+      E: ['111', '100', '110', '100', '111'],
+      F: ['111', '100', '110', '100', '100'],
+      G: ['011', '100', '101', '101', '011'],
+      H: ['101', '101', '111', '101', '101'],
+      I: ['111', '010', '010', '010', '111'],
+      J: ['001', '001', '001', '101', '010'],
+      K: ['101', '101', '110', '101', '101'],
+      L: ['100', '100', '100', '100', '111'],
+      M: ['101', '111', '111', '101', '101'],
+      N: ['111', '101', '101', '101', '101'],
+      O: ['010', '101', '101', '101', '010'],
+      P: ['110', '101', '110', '100', '100'],
+      Q: ['010', '101', '101', '111', '011'],
+      R: ['110', '101', '110', '101', '101'],
+      S: ['011', '100', '010', '001', '110'],
+      T: ['111', '010', '010', '010', '010'],
+      U: ['101', '101', '101', '101', '111'],
+      V: ['101', '101', '101', '101', '010'],
+      W: ['101', '101', '111', '111', '101'],
+      X: ['101', '101', '010', '101', '101'],
+      Y: ['101', '101', '010', '010', '010'],
+      Z: ['111', '001', '010', '100', '111'],
+      '0': ['111', '101', '101', '101', '111'],
+      '1': ['010', '110', '010', '010', '111'],
+      '2': ['110', '001', '010', '100', '111'],
+      '3': ['110', '001', '010', '001', '110'],
+      '4': ['101', '101', '111', '001', '001'],
+      '5': ['111', '100', '110', '001', '110'],
+      '6': ['011', '100', '111', '101', '111'],
+      '7': ['111', '001', '010', '010', '010'],
+      '8': ['111', '101', '111', '101', '111'],
+      '9': ['111', '101', '111', '001', '110'],
+      '-': ['000', '000', '111', '000', '000'],
+      '.': ['000', '000', '000', '000', '010'],
+      '!': ['010', '010', '010', '000', '010'],
+      '?': ['110', '001', '010', '000', '010'],
+      '/': ['001', '001', '010', '100', '100'],
+      ':': ['000', '010', '000', '010', '000'],
+      '_': ['000', '000', '000', '000', '111'],
+      '+': ['000', '010', '111', '010', '000'],
+      ' ': ['000', '000', '000', '000', '000'],
+    };
+
+    /**
+     * Converts a string into a 5-row boolean bitmap array using FONT_3X5.
+     */
+    function textToBitmap(str) {
+      const clean = (str || ' ').toUpperCase();
+      const rows = [[], [], [], [], []];
+      for (let i = 0; i < clean.length; i++) {
+        const glyph = FONT_3X5[clean[i]] || FONT_3X5[' '];
+        for (let r = 0; r < 5; r++) {
+          for (let c = 0; c < 3; c++) {
+            rows[r].push(glyph[r][c] === '1');
+          }
+          if (i < clean.length - 1) rows[r].push(false); // 1-col letter spacing
+        }
+      }
+      return rows;
+    }
+
+    // =========================================================================
+    // 19 PROCEDURAL ASCII EFFECTS
+    // =========================================================================
+
+    const EFFECTS = [
+      // 0. LIVE NAME STREAMER (FIRST CELL — TOP LEFT)
+      {
+        id: 'name-streamer',
+        title: 'Name Streamer',
+        tag: 'LIVE INPUT',
+        cols: 36,
+        rows: 13,
+        fps: 20,
+        interactive: false,
+        hasNameInput: true,
+        init(state) {
+          state.text = 'KAI KLEINBARD';
+        },
+        description:
+          'Type any name or phrase below to live-stream it into a 3×5 procedural ASCII bitmap with a traveling shimmer wave. Automatically wraps two words or marquee-scrolls longer text.',
+        code: `// Live 3x5 bitmap rasterizer + traveling glyph wave
+const bit = bitmap[row][col];
+const wave = Math.sin(x * 0.35 - t * 5.2 + y * 0.4);
+const glyph = bit
+  ? (wave > 0.45 ? '@' : wave > -0.1 ? '#' : '+')
+  : (bgRipple ? '·' : ' ');`,
+        render(t, state, pointer, cols, rows) {
+          const raw = (state.text || '').trim();
+          const display = raw.length > 0 ? raw : 'TYPE NAME';
+          const words = display.split(/\s+/);
+
+          let lines = [display];
+          if (words.length >= 2) {
+            const mid = Math.ceil(words.length / 2);
+            lines = [words.slice(0, mid).join(' '), words.slice(mid).join(' ')];
+          }
+
+          const bitmaps = lines.map((line) => textToBitmap(line));
+          const totalHeight = bitmaps.length === 2 ? 11 : 5;
+          const topPad = Math.floor((rows - totalHeight) / 2);
+          const scrollTick = Math.floor(t * 10);
+
+          let out = '';
+          for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+              let lit = false;
+              const relY = y - topPad;
+
+              if (bitmaps.length === 1) {
+                if (relY >= 0 && relY < 5) {
+                  const bm = bitmaps[0];
+                  const w = bm[0].length;
+                  if (w <= cols) {
+                    const leftPad = Math.floor((cols - w) / 2);
+                    const bx = x - leftPad;
+                    if (bx >= 0 && bx < w) lit = bm[relY][bx];
+                  } else {
+                    const padW = w + 6;
+                    const bx = (x + scrollTick) % padW;
+                    if (bx < w) lit = bm[relY][bx];
+                  }
+                }
+              } else {
+                const lineIdx = relY >= 0 && relY < 5 ? 0 : relY >= 6 && relY < 11 ? 1 : -1;
+                if (lineIdx !== -1) {
+                  const bm = bitmaps[lineIdx];
+                  const bmRow = lineIdx === 0 ? relY : relY - 6;
+                  const w = bm[0].length;
+                  if (w <= cols) {
+                    const leftPad = Math.floor((cols - w) / 2);
+                    const bx = x - leftPad;
+                    if (bx >= 0 && bx < w) lit = bm[bmRow][bx];
+                  } else {
+                    const padW = w + 6;
+                    const bx = (x + scrollTick) % padW;
+                    if (bx < w) lit = bm[bmRow][bx];
+                  }
+                }
+              }
+
+              if (lit) {
+                const shimmer = Math.sin(x * 0.32 - t * 5.4 + y * 0.45);
+                out += shimmer > 0.45 ? '@' : shimmer > -0.15 ? '#' : shimmer > -0.6 ? '+' : '=';
+              } else {
+                const bg = Math.sin(x * 0.22 + y * 0.5 - t * 2.4);
+                out += bg > 0.92 ? '·' : ' ';
+              }
+            }
+            if (y < rows - 1) out += '\n';
+          }
+          return out;
+        },
+      },
+
+      // 0B. CLICK ME — CLICKABLE LIVE LINK PORTAL (DISTINCT INPUT STYLE)
+      {
+        id: 'click-me-link',
+        title: 'CLICK ME',
+        tag: 'LIVE LINK',
+        cols: 36,
+        rows: 15,
+        fps: 22,
+        interactive: true,
+        hasLinkInput: true,
+        clickableLink: true,
+        init(state) {
+          state.text = 'https://www.linkedin.com/in/kai-kleinbard/';
+        },
+        description:
+          'A floating ASCII portal that streams any URL or text you type below and turns the entire animation into a live clickable beacon. Pre-loaded with Kai Kleinbard’s LinkedIn profile—hover to energize the converging arrows and click to launch.',
+        code: `// Floating ASCII portal + converging arrows + clickable marquee
+const floatY = Math.round(Math.sin(t * 2.4) * 0.6);
+const speed  = pointer.active ? 14 : 7;
+const ticker = marquee(state.text, innerW, Math.floor(t * speed));
+// Hovering switches field glyphs to inward '> < ^ v' vectors; click opens URL`,
+        render(t, state, pointer, cols, rows) {
+          const grid = Array.from({ length: rows }, () => Array(cols).fill(' '));
+          const raw = (state.text || '').trim();
+          const displayUrl = raw || 'ENTER ANY LINK OR TEXT';
+          const hovered = pointer.active;
+
+          // 1. Background kinetic field (converging arrows on hover, subtle radar dots when idle)
+          const cx = (cols - 1) / 2;
+          const cy = (rows - 1) / 2;
+          for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+              const dx = x - cx;
+              const dy = y - cy;
+              const dist = Math.hypot(dx * 0.55, dy);
+              const wave = Math.sin(dist * 1.1 + t * (hovered ? 7.5 : 3.2));
+              if (hovered) {
+                if (wave > 0.55) {
+                  if (Math.abs(dx) * 0.55 > Math.abs(dy)) {
+                    grid[y][x] = dx > 0 ? '<' : '>';
+                  } else {
+                    grid[y][x] = dy > 0 ? '^' : 'v';
+                  }
+                } else if (wave > 0.1) {
+                  grid[y][x] = '·';
+                }
+              } else if (wave > 0.72) {
+                grid[y][x] = '·';
+              } else if (wave > 0.45 && (x + y) % 3 === 0) {
+                grid[y][x] = ':';
+              }
+            }
+          }
+
+          // 2. Floating isometric-shadowed portal box
+          const boxW = 30;
+          const boxH = 9;
+          const bx = Math.floor((cols - boxW) / 2);
+          const floatOffset = Math.round(Math.sin(t * 2.6) * 0.65);
+          const by = Math.max(1, Math.min(rows - boxH - 2, Math.floor((rows - boxH) / 2) + floatOffset));
+
+          // Drop shadow
+          for (let sy = by + 1; sy <= by + boxH; sy++) {
+            for (let sx = bx + 2; sx <= bx + boxW + 1; sx++) {
+              if (sy >= 0 && sy < rows && sx >= 0 && sx < cols) {
+                grid[sy][sx] = '░';
+              }
+            }
+          }
+
+          // Clear interior & draw double-line border
+          const spin = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+          const sp = spin[Math.floor(t * 14) % spin.length];
+          for (let y = by; y < by + boxH; y++) {
+            for (let x = bx; x < bx + boxW; x++) {
+              if (y === by && x === bx) grid[y][x] = '╔';
+              else if (y === by && x === bx + boxW - 1) grid[y][x] = '╗';
+              else if (y === by + boxH - 1 && x === bx) grid[y][x] = '╚';
+              else if (y === by + boxH - 1 && x === bx + boxW - 1) grid[y][x] = '╝';
+              else if (y === by || y === by + boxH - 1) {
+                grid[y][x] = (x + Math.floor(t * 8)) % 7 === 0 ? '╪' : '═';
+              } else if (x === bx || x === bx + boxW - 1) {
+                grid[y][x] = '║';
+              } else {
+                grid[y][x] = ' ';
+              }
+            }
+          }
+
+          const writeCentered = (rowY, str) => {
+            const innerW = boxW - 2;
+            const clipped = str.slice(0, innerW);
+            const startX = bx + 1 + Math.floor((innerW - clipped.length) / 2);
+            for (let i = 0; i < clipped.length; i++) {
+              if (rowY >= 0 && rowY < rows && startX + i < cols) {
+                grid[rowY][startX + i] = clipped[i];
+              }
+            }
+          };
+
+          // Derive dynamic badge label from user text
+          let headerLabel = `${sp} CLICK TO LAUNCH ${sp}`;
+          if (/linkedin\.com\/in\/([^/?#]+)/i.test(displayUrl)) {
+            const slug = displayUrl
+              .match(/linkedin\.com\/in\/([^/?#]+)/i)[1]
+              .replace(/-/g, ' ')
+              .toUpperCase();
+            headerLabel = `${sp} IN // ${slug} ${sp}`;
+          } else if (/^https?:\/\//i.test(displayUrl)) {
+            const host = displayUrl.replace(/^https?:\/\/(www\.)?/i, '').split('/')[0].toUpperCase();
+            headerLabel = `${sp} OPEN // ${host} ${sp}`;
+          }
+
+          // Animated horizontal divider pulse
+          const innerW = boxW - 2;
+          const pulsePos = Math.floor(t * (hovered ? 24 : 12)) % innerW;
+          let divider = '';
+          for (let i = 0; i < innerW; i++) {
+            const d = Math.abs(i - pulsePos);
+            divider += d === 0 ? '◆' : d === 1 ? '═' : '─';
+          }
+
+          // Live marquee of the entered URL or text
+          const cleanText = displayUrl.replace(/^https?:\/\//i, '');
+          const padText = `${cleanText}   ·   `;
+          const tickerSpeed = hovered ? 14 : 7;
+          const scrollOffset = Math.floor(t * tickerSpeed) % padText.length;
+          let marqueeStr = '';
+          if (cleanText.length <= innerW - 2) {
+            marqueeStr = cleanText;
+          } else {
+            for (let i = 0; i < innerW - 2; i++) {
+              marqueeStr += padText[(scrollOffset + i) % padText.length];
+            }
+          }
+
+          const ctaLabel = hovered ? '>>>  LAUNCH LINK  <<<' : '[ CLICK ANIMATION ↗ ]';
+
+          writeCentered(by + 2, headerLabel);
+          writeCentered(by + 3, divider);
+          writeCentered(by + 5, marqueeStr);
+          writeCentered(by + 7, ctaLabel);
+
+          return grid.map((r) => r.join('')).join('\n');
+        },
+      },
+
+      // 1. DIAMOND STREAMER
+      {
+        id: 'diamond-streamer',
+        title: 'Diamond Streamer',
+        tag: 'MANHATTAN SDF',
+        cols: 36,
+        rows: 17,
+        fps: 22,
+        interactive: false,
+        description:
+          'Characters stream continuously inward toward the center along Manhattan-distance (|x| + |y|) iso-contours, forming a breathing, faceted monochrome diamond.',
+        code: `// Manhattan distance diamond streamer
+const d = Math.abs(x - cx) * 0.55 + Math.abs(y - cy);
+const stream = (d - t * 6.5) % 4;
+const glyph = ramp[Math.floor(intensity * (ramp.length - 1))];`,
+        render(t, state, pointer, cols, rows) {
+          const ramp = ' .·:-=+*#%@';
+          const cx = (cols - 1) / 2;
+          const cy = (rows - 1) / 2;
+          let out = '';
+
+          for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+              const d = Math.abs(x - cx) * 0.54 + Math.abs(y - cy);
+              const maxD = 8.2 + Math.sin(t * 2.1) * 0.8;
+              if (d > maxD) {
+                out += ' ';
+                continue;
+              }
+              const wave = (Math.sin(d * 1.45 + t * 5.2) + 1) * 0.5;
+              const edgeHighlight = Math.abs(d - maxD) < 0.7 ? 0.35 : 0;
+              const val = Math.min(0.999, wave * 0.8 + edgeHighlight);
+              out += ramp[Math.floor(val * ramp.length)];
+            }
+            if (y < rows - 1) out += '\n';
+          }
+          return out;
+        },
+      },
+
+      // 2. DANCING GHOSTTY (SMOOTH 3D SPINNING & FLOATING MONOCHROME MASCOT)
+      {
+        id: 'dancing-ghostty',
+        title: 'Dancing Ghostty',
+        tag: '3D MASCOT',
+        cols: 42,
+        rows: 25,
+        fps: 24,
+        interactive: false,
+        isHtml: true,
+        inspirationUrl: 'https://ghostty.org/',
+        inspirationLabel: 'GHOSTTY.ORG',
+        description:
+          'Inspired by the Ghostty terminal mascot (ghostty.org). A real-time procedural 3D ghost surface that smoothly spins around its vertical axis and floats while projecting the recessed ">_" terminal prompt face and a shimmering monochrome aura contour.',
+        code: `// Procedural 3D spinning & floating Ghostty mascot (monochrome)
+const rotY = t * 1.15;
+const floatY = Math.sin(t * 2.1) * 1.15;
+// Capsule silhouette + 3-lobed wavy skirt + front ">_" cutout
+const phi = Math.atan2(nx / width, nz) - rotY;
+// Distance-field halo renders shimmering monochrome contour glyphs`,
+        render(t, state, pointer, cols, rows) {
+          const cx = (cols - 1) / 2;
+          const cy = (rows - 1) / 2 + Math.sin(t * 2.1) * 1.15;
+          const rx = cols * 0.29;
+          const ry = rows * 0.37;
+          const rotY = t * 1.15;
+          const TWO_PI = Math.PI * 2;
+
+          // Pass 1: Rasterize 3D ghost surface and recessed ">_" face
+          const bodyMask = Array.from({ length: rows }, () => new Uint8Array(cols));
+          const charGrid = Array.from({ length: rows }, () => Array(cols).fill(' '));
+          const tierGrid = Array.from({ length: rows }, () => new Uint8Array(cols)); // 0=none, 1=lo, 2=md, 3=hi
+
+          for (let y = 0; y < rows; y++) {
+            const ny = (y - cy) / ry;
+            if (ny < -1.02 || ny > 1.04) continue;
+
+            // Dome head + straight torso profile
+            let halfW = 0;
+            if (ny < -0.18) {
+              const dy = (ny + 0.18) / 0.82;
+              const sq = 1 - dy * dy;
+              if (sq <= 0) continue;
+              halfW = Math.sqrt(sq);
+            } else {
+              halfW = 1.0 - Math.max(0, ny + 0.18) * 0.03;
+            }
+
+            for (let x = 0; x < cols; x++) {
+              const nx = (x - cx) / rx;
+              if (Math.abs(nx) > halfW) continue;
+
+              const uNorm = nx / Math.max(0.001, halfW);
+              const nz = Math.sqrt(Math.max(0, 1 - uNorm * uNorm));
+
+              // Surface angle around vertical axis
+              let phi = Math.atan2(uNorm, nz) - rotY;
+              phi = ((phi + Math.PI) % TWO_PI + TWO_PI) % TWO_PI - Math.PI;
+
+              // 3-lobed undulating skirt along the bottom edge
+              const skirtBottom = 0.78 + 0.15 * Math.sin(phi * 3.0 + Math.sin(t * 2.2) * 0.45);
+              if (ny > skirtBottom) continue;
+
+              bodyMask[y][x] = 1;
+
+              // Recessed Ghostty terminal face: ">" on left, "_" on right (front hemisphere)
+              let isCutout = false;
+              let isCutoutRim = false;
+              if (Math.abs(phi) < 1.08 && ny > -0.36 && ny < 0.18) {
+                // Left ">" chevron
+                const inChevX = phi >= -0.72 && phi <= -0.18;
+                const dUpper = Math.abs((ny - -0.09) - (phi - -0.18) * 0.46);
+                const dLower = Math.abs((ny - -0.09) + (phi - -0.18) * 0.46);
+                const chevDist = Math.min(
+                  ny <= -0.09 ? dUpper : 9,
+                  ny >= -0.09 ? dLower : 9
+                );
+                if (inChevX && chevDist < 0.072) isCutout = true;
+                else if (inChevX && chevDist < 0.125) isCutoutRim = true;
+
+                // Right "_" cursor bar
+                const inBarX = phi >= 0.12 && phi <= 0.68;
+                const inBarY = ny >= -0.06 && ny <= 0.075;
+                const nearBar =
+                  phi >= 0.06 && phi <= 0.74 && ny >= -0.12 && ny <= 0.13;
+                if (inBarX && inBarY) isCutout = true;
+                else if (nearBar) isCutoutRim = true;
+              }
+
+              if (isCutout) {
+                charGrid[y][x] = ' ';
+                tierGrid[y][x] = 0;
+                continue;
+              }
+
+              // Smooth directional + curvature shading (pure monochrome)
+              const light = nz * 0.78 + uNorm * 0.16 - ny * 0.12;
+              const edgeDist = skirtBottom - ny;
+
+              if (isCutoutRim) {
+                charGrid[y][x] = nz > 0.6 ? '@' : '*';
+                tierGrid[y][x] = 2;
+              } else if (edgeDist < 0.085) {
+                charGrid[y][x] = nz > 0.55 ? '%' : 'o';
+                tierGrid[y][x] = 2;
+              } else if (light > 0.68) {
+                charGrid[y][x] = '$';
+                tierGrid[y][x] = 3;
+              } else if (light > 0.44) {
+                charGrid[y][x] = '@';
+                tierGrid[y][x] = 3;
+              } else if (light > 0.25) {
+                charGrid[y][x] = '%';
+                tierGrid[y][x] = 2;
+              } else if (light > 0.12) {
+                charGrid[y][x] = 'o';
+                tierGrid[y][x] = 2;
+              } else {
+                charGrid[y][x] = '~';
+                tierGrid[y][x] = 1;
+              }
+            }
+          }
+
+          // Pass 2: Shimmering monochrome aura contour around the silhouette
+          const auraChars = ['+', '=', '*', 'x', '+', '=', 'o'];
+          const shimmerTick = t * 5.0;
+
+          for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+              if (bodyMask[y][x]) continue;
+
+              let minD2 = 999;
+              for (let dy = -2; dy <= 2; dy++) {
+                const sy = y + dy;
+                if (sy < 0 || sy >= rows) continue;
+                for (let dx = -4; dx <= 4; dx++) {
+                  const sx = x + dx;
+                  if (sx < 0 || sx >= cols) continue;
+                  if (bodyMask[sy][sx]) {
+                    // Aspect-ratio corrected squared distance
+                    const d2 = (dx * 0.52) * (dx * 0.52) + dy * dy;
+                    if (d2 < minD2) minD2 = d2;
+                  }
+                }
+              }
+
+              // Outer floating halo ring (strictly monochrome dim gray)
+              if (minD2 >= 2.25 && minD2 <= 4.35) {
+                const wave = Math.sin(x * 0.35 + y * 0.45 - shimmerTick);
+                const idx = Math.floor(((wave + 1) * 0.5) * (auraChars.length - 1));
+                charGrid[y][x] = auraChars[idx];
+                tierGrid[y][x] = 1;
+              }
+            }
+          }
+
+          // Build batched monochrome HTML spans
+          const lines = [];
+          for (let y = 0; y < rows; y++) {
+            let rowHtml = '';
+            let curTier = 0;
+            let chunk = '';
+            const flush = () => {
+              if (!chunk) return;
+              const safe = escapeHtml(chunk);
+              if (curTier === 3) rowHtml += `<span class="c-hi">${safe}</span>`;
+              else if (curTier === 2) rowHtml += `<span class="c-md">${safe}</span>`;
+              else if (curTier === 1) rowHtml += `<span class="c-lo">${safe}</span>`;
+              else rowHtml += safe;
+              chunk = '';
+            };
+            for (let x = 0; x < cols; x++) {
+              const tVal = tierGrid[y][x];
+              const ch = charGrid[y][x];
+              if (tVal !== curTier) {
+                flush();
+                curTier = tVal;
+              }
+              chunk += ch;
+            }
+            flush();
+            lines.push(rowHtml);
+          }
+          return lines.join('\n');
+        },
+      },
+
+      // 3. INTERACTIVE HOVER WAVE FIELD
+      {
+        id: 'hover-wave',
+        title: 'Hover Wave Field',
+        tag: 'INTERACTIVE',
+        cols: 36,
+        rows: 15,
+        fps: 26,
+        interactive: true,
+        init(state) {
+          state.ripples = [];
+          state.lastAuto = 0;
+        },
+        description:
+          'Move your cursor or finger across the grid to inject radial wave ripples into a resting ASCII sea. Ambient ripples continue automatically when idle.',
+        code: `// Pointer-driven radial interference waves
+const dx = (x - px) * 0.55;
+const dy = y - py;
+const dist = Math.hypot(dx, dy);
+const ripple = Math.sin(dist * 1.15 - age * 8.5) * Math.exp(-dist * 0.14);
+const glyph = ramp[Math.floor(((sum + 1) / 2) * (ramp.length - 1))];`,
+        render(t, state, pointer, cols, rows) {
+          const ramp = ' .·~-:=+*#%@';
+          if (pointer.active) {
+            const px = pointer.x * (cols - 1);
+            const py = pointer.y * (rows - 1);
+            const last = state.ripples[state.ripples.length - 1];
+            if (!last || Math.hypot(last.x - px, last.y - py) > 1.8 || t - last.t0 > 0.18) {
+              state.ripples.push({ x: px, y: py, t0: t });
+            }
+          } else if (t - state.lastAuto > 1.35) {
+            state.lastAuto = t;
+            state.ripples.push({
+              x: (0.2 + Math.random() * 0.6) * cols,
+              y: (0.2 + Math.random() * 0.6) * rows,
+              t0: t,
+            });
+          }
+          state.ripples = state.ripples.filter((r) => t - r.t0 < 2.6).slice(-8);
+
+          let out = '';
+          for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+              let sum = Math.sin(x * 0.25 + t * 1.5) * 0.15;
+              for (let i = 0; i < state.ripples.length; i++) {
+                const r = state.ripples[i];
+                const age = t - r.t0;
+                const d = Math.hypot((x - r.x) * 0.55, y - r.y);
+                const front = age * 9.5;
+                const band = Math.exp(-Math.pow((d - front) * 0.55, 2));
+                sum += Math.sin(d * 1.4 - age * 10) * band * Math.exp(-age * 0.9);
+              }
+              const norm = Math.max(0, Math.min(0.999, (sum + 1) * 0.5));
+              out += ramp[Math.floor(norm * ramp.length)];
+            }
+            if (y < rows - 1) out += '\n';
+          }
+          return out;
+        },
+      },
+
+      // 4. SPINNING GLYPH SCROLL
+      {
+        id: 'spinning-scroll',
+        title: 'Spinning Glyph Scroll',
+        tag: 'ROTATIONAL STREAM',
+        cols: 36,
+        rows: 11,
+        fps: 20,
+        interactive: false,
+        description:
+          'Horizontal text ribbons scroll across alternating lanes while every incoming character spins through a 4-frame rotational cycle (| / - \\) and Braille vortices before locking into crisp typography.',
+        code: `// Characters spin as they enter from the right edge
+const spinners = ['|', '/', '-', '\\\\'];
+const spinProgress = (cols - x) / 8;
+const ch = spinProgress < 1
+  ? spinners[(tick + x + y) & 3]
+  : message[(x + offset) % message.length];`,
+        render(t, state, pointer, cols, rows) {
+          const spinners = ['|', '/', '-', '\\'];
+          const brailleSpin = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+          const phrases = [
+            'MONOCHROME·STREAM·BUFFER·',
+            'ROTATIONAL·GLYPH·PIPELINE·',
+            'TERMINAL·TEXT·MATRIX·LOOP·',
+            'MINIMAL·ASCII·CHOREOGRAPHY·',
+          ];
+          const tick = Math.floor(t * 14);
+          let out = '';
+
+          for (let y = 0; y < rows; y++) {
+            const phrase = phrases[y % phrases.length];
+            const dir = y % 2 === 0 ? 1 : -1;
+            const speed = 1 + (y % 3);
+            const offset = Math.floor(t * 6 * speed) * dir;
+            const waveSpin = Math.floor(((Math.sin(t * 2.2 + y * 0.7) + 1) * 0.5) * cols);
+
+            for (let x = 0; x < cols; x++) {
+              const distToSpinWave = Math.abs(x - waveSpin);
+              const atEntryEdge = dir === 1 ? x > cols - 7 : x < 7;
+
+              if (atEntryEdge) {
+                out += spinners[(tick + x + y) & 3];
+              } else if (distToSpinWave < 3) {
+                out += brailleSpin[(tick + x * 2 + y) % brailleSpin.length];
+              } else {
+                const idx = (((x + offset) % phrase.length) + phrase.length) % phrase.length;
+                out += phrase[idx];
+              }
+            }
+            if (y < rows - 1) out += '\n';
+          }
+          return out;
+        },
+      },
+
+      // 5. DANCING 3D CUBE
+      {
+        id: 'dancing-cube',
+        title: 'Dancing 3D Cube',
+        tag: '3D Z-BUFFER',
+        cols: 36,
+        rows: 21,
+        fps: 24,
+        interactive: false,
+        description:
+          'A shaded 3D ASCII cube that bounces with rhythmic squash-and-stretch, tumbling through pitch, yaw, and roll with a software z-buffer and directional lighting.',
+        code: `// 3D cube surface sampling + squash-and-stretch bounce
+const bounce = Math.abs(Math.sin(t * 3.8));
+const squashY = 0.85 + bounce * 0.3;
+const squashXZ = 1 / Math.sqrt(squashY);
+// Rotate (x,y,z) -> perspective project -> z-buffer shade`,
+        render(t, state, pointer, cols, rows) {
+          const zBuf = new Float32Array(cols * rows).fill(-1e9);
+          const buf = Array(cols * rows).fill(' ');
+
+          const A = t * 1.4;
+          const B = t * 1.9;
+          const C = t * 0.8;
+          const bounce = Math.abs(Math.sin(t * 4.2));
+          const squashY = 0.82 + bounce * 0.32;
+          const squashXZ = 1 / Math.sqrt(squashY);
+          const yLift = (bounce - 0.45) * 3.4;
+
+          const sinA = Math.sin(A), cosA = Math.cos(A);
+          const sinB = Math.sin(B), cosB = Math.cos(B);
+          const sinC = Math.sin(C), cosC = Math.cos(C);
+
+          const project = (ix, iy, iz, ch) => {
+            const x0 = ix * squashXZ;
+            const y0 = iy * squashY;
+            const z0 = iz * squashXZ;
+
+            const x1 = x0 * cosB + z0 * sinB;
+            const z1 = -x0 * sinB + z0 * cosB;
+            const y2 = y0 * cosA - z1 * sinA;
+            const z2 = y0 * sinA + z1 * cosA;
+            const x3 = x1 * cosC - y2 * sinC;
+            const y3 = x1 * sinC + y2 * cosC;
+
+            const dist = 28;
+            const ooz = 1 / (z2 + dist);
+            const xp = Math.floor(cols / 2 + x3 * ooz * 35);
+            const yp = Math.floor(rows / 2 - (y3 + yLift) * ooz * 19);
+
+            if (xp >= 0 && xp < cols && yp >= 0 && yp < rows) {
+              const idx = yp * cols + xp;
+              if (ooz > zBuf[idx]) {
+                zBuf[idx] = ooz;
+                buf[idx] = ch;
+              }
+            }
+          };
+
+          const size = 5.6;
+          const step = 0.7;
+          for (let u = -size; u <= size; u += step) {
+            for (let v = -size; v <= size; v += step) {
+              project(u, v, -size, '@');
+              project(size, v, u, '#');
+              project(-size, v, -u, '+');
+              project(-u, v, size, '=');
+              project(u, -size, -v, ':');
+              project(u, size, v, '.');
+            }
+          }
+
+          let out = '';
+          for (let y = 0; y < rows; y++) {
+            out += buf.slice(y * cols, (y + 1) * cols).join('');
+            if (y < rows - 1) out += '\n';
+          }
+          return out;
+        },
+      },
+
+      // 6. BACKWARDS WATERFALL
+      {
+        id: 'backwards-stream',
+        title: 'Backwards Waterfall',
+        tag: 'REVERSE FLOW',
+        cols: 36,
+        rows: 24,
+        fps: 18,
+        interactive: false,
+        init(state, cols, rows) {
+          state.drops = Array.from({ length: cols }, () => ({
+            y: Math.random() * rows,
+            speed: 0.25 + Math.random() * 0.55,
+            len: 5 + Math.floor(Math.random() * 8),
+          }));
+        },
+        description:
+          'An anti-gravity character stream that rises bottom-to-top while spelling reversed words and fading from solid white heads into dotted trailing wakes.',
+        code: `// Anti-gravity upward stream with reversed glyph trails
+drop.y -= drop.speed;
+if (drop.y < -drop.len) drop.y = rows + 2;
+const ch = reversedCharset[(row + tick) % len];`,
+        render(t, state, pointer, cols, rows) {
+          const grid = Array.from({ length: rows }, () => Array(cols).fill(' '));
+          const revChars = 'ZYXWVUTSRQPONMLKJIHGFEDCBA9876543210';
+          const tick = Math.floor(t * 10);
+
+          for (let x = 0; x < cols; x++) {
+            const d = state.drops[x];
+            d.y -= d.speed;
+            if (d.y < -d.len) {
+              d.y = rows + Math.random() * 4;
+              d.speed = 0.25 + Math.random() * 0.55;
+            }
+            const head = Math.floor(d.y);
+            for (let k = 0; k < d.len; k++) {
+              const gy = head + k;
+              if (gy >= 0 && gy < rows) {
+                if (k === 0) {
+                  grid[gy][x] = revChars[(tick + x * 3) % revChars.length];
+                } else if (k < 3) {
+                  grid[gy][x] = revChars[(tick + x * 3 + k) % revChars.length].toLowerCase();
+                } else if (k < d.len - 1) {
+                  grid[gy][x] = ':';
+                } else {
+                  grid[gy][x] = '·';
+                }
+              }
+            }
+          }
+          return grid.map((r) => r.join('')).join('\n');
+        },
+      },
+
+      // 7. SINGULARITY VORTEX
+      {
+        id: 'singularity-vortex',
+        title: 'Singularity Vortex',
+        tag: 'POLAR SPIRAL',
+        cols: 36,
+        rows: 18,
+        fps: 22,
+        interactive: false,
+        description:
+          'Logarithmic spiral arms pull character density inward toward a dark event horizon, using polar angle + radius warping.',
+        code: `// Polar spiral density field
+const r = Math.hypot(dx, dy);
+const theta = Math.atan2(dy, dx);
+const spiral = Math.sin(theta * 3 + r * 1.15 - t * 4.5);`,
+        render(t, state, pointer, cols, rows) {
+          const ramp = '  .·:-=+*#%@';
+          const cx = (cols - 1) / 2;
+          const cy = (rows - 1) / 2;
+          let out = '';
+          for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+              const dx = (x - cx) * 0.52;
+              const dy = y - cy;
+              const r = Math.hypot(dx, dy);
+              if (r < 1.15) {
+                out += ' ';
+                continue;
+              }
+              const theta = Math.atan2(dy, dx);
+              const val = (Math.sin(theta * 3 + r * 1.25 - t * 4.8) + 1) * 0.5;
+              const fade = Math.min(1, r / 3) * Math.max(0, 1 - r / 11.5);
+              const idx = Math.min(ramp.length - 1, Math.floor(val * fade * ramp.length));
+              out += ramp[idx];
+            }
+            if (y < rows - 1) out += '\n';
+          }
+          return out;
+        },
+      },
+
+      // 8. DNA HELIX ASCENT
+      {
+        id: 'dna-helix',
+        title: 'DNA Helix Ascent',
+        tag: 'DOUBLE STRAND',
+        cols: 34,
+        rows: 25,
+        fps: 20,
+        interactive: false,
+        description:
+          'Two counter-phased sine strands twist upward continuously, joined by depth-cued base-pair rungs that swap characters when crossing front-to-back.',
+        code: `// Counter-phased double helix
+const phase = y * 0.42 - t * 3.4;
+const x1 = cx + Math.sin(phase) * amp;
+const x2 = cx + Math.sin(phase + Math.PI) * amp;
+// Depth z = cos(phase) chooses '@' (front) vs '·' (back)`,
+        render(t, state, pointer, cols, rows) {
+          const cx = Math.floor(cols / 2);
+          const amp = Math.floor(cols * 0.34);
+          let out = '';
+          for (let y = 0; y < rows; y++) {
+            const row = Array(cols).fill(' ');
+            const phase = y * 0.42 - t * 3.4;
+            const s1 = Math.sin(phase);
+            const c1 = Math.cos(phase);
+            const x1 = Math.round(cx + s1 * amp);
+            const x2 = Math.round(cx - s1 * amp);
+
+            const lo = Math.min(x1, x2);
+            const hi = Math.max(x1, x2);
+            const rungChar = y % 2 === 0 ? '─' : '·';
+            for (let x = lo + 1; x < hi; x++) {
+              if (x >= 0 && x < cols) row[x] = rungChar;
+            }
+
+            const ch1 = c1 > 0.2 ? '@' : c1 > -0.3 ? 'O' : '·';
+            const ch2 = -c1 > 0.2 ? '@' : -c1 > -0.3 ? 'O' : '·';
+            if (x1 >= 0 && x1 < cols) row[x1] = ch1;
+            if (x2 >= 0 && x2 < cols) row[x2] = ch2;
+
+            out += row.join('');
+            if (y < rows - 1) out += '\n';
+          }
+          return out;
+        },
+      },
+
+      // 9. MONOCHROME TORUS (DONUT)
+      {
+        id: 'mono-torus',
+        title: 'Monochrome Torus',
+        tag: '3D SHADER',
+        cols: 36,
+        rows: 17,
+        fps: 22,
+        interactive: false,
+        description:
+          'A compact real-time 3D torus rendered via surface-normal dot-product luminance across 12 ASCII shading levels.',
+        code: `// Parametric torus surface normal luminance
+const L = cosPhi * cosTheta * sinB - cosA * cosTheta * sinPhi
+        - sinA * sinTheta + cosB * (cosA * sinTheta - cosTheta * sinA * sinPhi);
+const ch = '.,-~:;=!*#$@'[Math.floor(L * 8)];`,
+        render(t, state, pointer, cols, rows) {
+          const zBuf = new Float32Array(cols * rows).fill(0);
+          const buf = Array(cols * rows).fill(' ');
+          const lumChars = '.,-~:;=!*#$@';
+
+          const A = t * 1.1;
+          const B = t * 0.65;
+          const sinA = Math.sin(A), cosA = Math.cos(A);
+          const sinB = Math.sin(B), cosB = Math.cos(B);
+
+          for (let j = 0; j < 6.28; j += 0.12) {
+            const cosJ = Math.cos(j), sinJ = Math.sin(j);
+            for (let i = 0; i < 6.28; i += 0.05) {
+              const sinI = Math.sin(i), cosI = Math.cos(i);
+              const h = cosJ + 2;
+              const D = 1 / (sinI * h * sinA + sinJ * cosA + 5);
+              const m = sinI * h * cosA - sinJ * sinA;
+              const x = Math.floor(cols / 2 + 19 * D * (cosI * h * cosB - m * sinB));
+              const y = Math.floor(rows / 2 + 10 * D * (cosI * h * sinB + m * cosB));
+              const N = Math.floor(
+                8 *
+                  ((sinJ * sinA - sinI * cosJ * cosA) * cosB -
+                    sinI * cosJ * sinA -
+                    sinJ * cosA -
+                    cosI * cosJ * sinB)
+              );
+              if (y >= 0 && y < rows && x >= 0 && x < cols) {
+                const idx = y * cols + x;
+                if (D > zBuf[idx]) {
+                  zBuf[idx] = D;
+                  buf[idx] = lumChars[Math.max(0, Math.min(lumChars.length - 1, N))];
+                }
+              }
+            }
+          }
+          let out = '';
+          for (let y = 0; y < rows; y++) {
+            out += buf.slice(y * cols, (y + 1) * cols).join('');
+            if (y < rows - 1) out += '\n';
+          }
+          return out;
+        },
+      },
+
+      // 10. REDACTION STREAM
+      {
+        id: 'redaction-stream',
+        title: 'Redaction Stream',
+        tag: 'SIGNAL SCRAMBLE',
+        cols: 36,
+        rows: 11,
+        fps: 15,
+        interactive: false,
+        description:
+          'Classified terminal lines cycle smoothly between dense block redactions (█ ▓ ▒ ░), glitching hex noise, and crisp decrypted plaintext phrases.',
+        code: `// Traveling decryption scanner bar
+const phase = Math.sin(x * 0.14 - t * 2.1 + y * 0.45);
+if (phase > 0.35) out += plaintext[x];
+else if (phase > 0.05) out += hexNoise;
+else out += '█';`,
+        render(t, state, pointer, cols, rows) {
+          const lines = [
+            'SYS.KERNEL // STREAM_SYNC_OK        ',
+            'MEM.ADDR   :: 0x00F4A9C1 -> LOCKED  ',
+            'PIPE.MONO  // ZERO_COLOR_ENFORCED   ',
+            'GLYPH.BUF  :: 60HZ_CHAR_PIPELINE    ',
+            'AUTH.SIG   // VERIFIED_CHECKSUM_99  ',
+            'TERM.NODE  :: LOOP_CONTINUOUS_MODE  ',
+            'DATA.MASK  // REDACTION_SWEEP_ACTIVE',
+          ];
+          const blocks = ['█', '▓', '▒', '░'];
+          const hex = '0123456789ABCDEF';
+          const tick = Math.floor(t * 14);
+          let out = '';
+
+          for (let y = 0; y < rows; y++) {
+            const src = lines[y % lines.length];
+            for (let x = 0; x < cols; x++) {
+              const wave = Math.sin(x * 0.15 - t * 2.2 + y * 0.55);
+              if (wave > 0.25) {
+                out += src[x % src.length];
+              } else if (wave > -0.1) {
+                out += hex[(tick + x * 7 + y * 13) % hex.length];
+              } else if (wave > -0.45) {
+                out += blocks[Math.min(3, Math.floor((wave + 0.45) * 10))];
+              } else {
+                out += '█';
+              }
+            }
+            if (y < rows - 1) out += '\n';
+          }
+          return out;
+        },
+      },
+
+      // 11. LISSAJOUS SCOPE
+      {
+        id: 'lissajous-scope',
+        title: 'Lissajous Scope',
+        tag: 'OSCILLOSCOPE',
+        cols: 36,
+        rows: 17,
+        fps: 24,
+        interactive: false,
+        description:
+          'A monochrome vector oscilloscope plotting harmonic Lissajous knots with phosphor decay trails along the parametric curve.',
+        code: `// Parametric Lissajous curve with phosphor decay
+const x = cx + Math.sin(3 * theta + t * 1.4) * rx;
+const y = cy + Math.sin(4 * theta + t * 0.7) * ry;
+// Older trail samples step down: '@' -> '#' -> '+' -> '·'`,
+        render(t, state, pointer, cols, rows) {
+          const grid = Array.from({ length: rows }, () => Array(cols).fill(' '));
+          const cx = (cols - 1) / 2;
+          const cy = (rows - 1) / 2;
+          const rx = cols * 0.42;
+          const ry = rows * 0.42;
+
+          for (let x = 0; x < cols; x += 2) grid[Math.floor(cy)][x] = '·';
+          for (let y = 0; y < rows; y += 2) grid[y][Math.floor(cx)] = '·';
+
+          const samples = 95;
+          for (let i = 0; i < samples; i++) {
+            const u = (i / samples) * Math.PI * 2;
+            const px = Math.round(cx + Math.sin(3 * u + t * 1.3) * rx);
+            const py = Math.round(cy + Math.sin(2 * u + t * 0.85) * ry);
+            if (px >= 0 && px < cols && py >= 0 && py < rows) {
+              const frac = i / samples;
+              grid[py][px] = frac > 0.8 ? '@' : frac > 0.55 ? '#' : frac > 0.3 ? '+' : ':';
+            }
+          }
+          return grid.map((r) => r.join('')).join('\n');
+        },
+      },
+
+      // 12. MOIRE INTERFERENCE
+      {
+        id: 'moire-field',
+        title: 'Moiré Interference',
+        tag: 'INTERACTIVE',
+        cols: 36,
+        rows: 16,
+        fps: 22,
+        interactive: true,
+        description:
+          'Two orbiting concentric ring emitters collide to create optical Moiré interference fringes. Hover to take manual control of the second emitter.',
+        code: `// Dual concentric ring interference
+const d1 = Math.hypot((x - c1x) * 0.55, y - c1y);
+const d2 = Math.hypot((x - c2x) * 0.55, y - c2y);
+const v = Math.sin(d1 * 1.4 - t * 3) + Math.sin(d2 * 1.4 - t * 3);`,
+        render(t, state, pointer, cols, rows) {
+          const ramp = '  .·:-=+*#%@';
+          const c1x = cols * 0.5 + Math.cos(t * 0.9) * cols * 0.28;
+          const c1y = rows * 0.5 + Math.sin(t * 1.1) * rows * 0.28;
+          const c2x = pointer.active
+            ? pointer.x * cols
+            : cols * 0.5 - Math.cos(t * 0.7) * cols * 0.28;
+          const c2y = pointer.active
+            ? pointer.y * rows
+            : rows * 0.5 - Math.sin(t * 1.3) * rows * 0.28;
+
+          let out = '';
+          for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+              const d1 = Math.hypot((x - c1x) * 0.55, y - c1y);
+              const d2 = Math.hypot((x - c2x) * 0.55, y - c2y);
+              const v = (Math.sin(d1 * 1.45 - t * 3.2) + Math.sin(d2 * 1.45 - t * 3.2)) * 0.25 + 0.5;
+              const idx = Math.max(0, Math.min(ramp.length - 1, Math.floor(v * ramp.length)));
+              out += ramp[idx];
+            }
+            if (y < rows - 1) out += '\n';
+          }
+          return out;
+        },
+      },
+
+      // 13. METABALL ISO-FIELD
+      {
+        id: 'metaball-field',
+        title: 'Metaball Iso-Field',
+        tag: 'ORGANIC BLOB',
+        cols: 36,
+        rows: 16,
+        fps: 22,
+        interactive: false,
+        description:
+          'Four wandering scalar energy wells merge and split organically across an ASCII iso-surface threshold.',
+        code: `// Inverse-square metaball potential field
+let field = 0;
+for (const b of blobs) {
+  field += (b.r * b.r) / (dx * dx + dy * dy + 0.4);
+}
+const ch = field > 1.3 ? '@' : field > 0.9 ? '#' : field > 0.6 ? ':' : ' ';`,
+        render(t, state, pointer, cols, rows) {
+          const blobs = [
+            { x: cols * (0.5 + 0.28 * Math.sin(t * 1.1)), y: rows * (0.5 + 0.3 * Math.cos(t * 0.9)), r: 2.8 },
+            { x: cols * (0.5 + 0.3 * Math.cos(t * 0.8 + 1)), y: rows * (0.5 + 0.28 * Math.sin(t * 1.3)), r: 2.5 },
+            { x: cols * (0.5 + 0.25 * Math.sin(t * 1.4 + 2)), y: rows * (0.5 + 0.25 * Math.sin(t * 0.7)), r: 2.4 },
+            { x: cols * (0.5 - 0.26 * Math.cos(t * 1.0)), y: rows * (0.5 - 0.3 * Math.cos(t * 1.2)), r: 2.3 },
+          ];
+          let out = '';
+          for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+              let f = 0;
+              for (let i = 0; i < blobs.length; i++) {
+                const dx = (x - blobs[i].x) * 0.55;
+                const dy = y - blobs[i].y;
+                f += (blobs[i].r * blobs[i].r) / (dx * dx + dy * dy + 0.35);
+              }
+              out += f > 1.55 ? '@' : f > 1.15 ? '#' : f > 0.85 ? '+' : f > 0.62 ? '·' : ' ';
+            }
+            if (y < rows - 1) out += '\n';
+          }
+          return out;
+        },
+      },
+
+      // 14. CELLULAR AUTOMATON (GAME OF LIFE)
+      {
+        id: 'cellular-life',
+        title: 'Cellular Automaton',
+        tag: 'EMERGENT LIFE',
+        cols: 36,
+        rows: 16,
+        fps: 10,
+        interactive: false,
+        init(state, cols, rows) {
+          state.grid = Array.from({ length: rows }, () =>
+            Array.from({ length: cols }, () => (Math.random() < 0.34 ? 1 : 0))
+          );
+          state.age = Array.from({ length: rows }, () => Array(cols).fill(0));
+          state.stepCount = 0;
+        },
+        description:
+          'Conway’s Game of Life with cell-age shading (fresh births spark as @, stable colonies settle into ▪ and ·) and automatic periodic reseeding.',
+        code: `// Toroidal Conway's Game of Life with age shading
+const alive = grid[y][x];
+const next = alive ? (n === 2 || n === 3 ? 1 : 0) : (n === 3 ? 1 : 0);
+// New cells render '@', mature cells '▪', fading trails '·'`,
+        render(t, state, pointer, cols, rows) {
+          const g = state.grid;
+          const age = state.age;
+          state.stepCount++;
+
+          if (state.stepCount % 90 === 0) {
+            for (let y = 0; y < rows; y++) {
+              for (let x = 0; x < cols; x++) {
+                if (Math.random() < 0.22) g[y][x] = 1;
+              }
+            }
+          }
+
+          const next = Array.from({ length: rows }, () => Array(cols).fill(0));
+          for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+              let n = 0;
+              for (let dy = -1; dy <= 1; dy++) {
+                for (let dx = -1; dx <= 1; dx++) {
+                  if (dx === 0 && dy === 0) continue;
+                  n += g[(y + dy + rows) % rows][(x + dx + cols) % cols];
+                }
+              }
+              const alive = g[y][x] ? n === 2 || n === 3 : n === 3;
+              next[y][x] = alive ? 1 : 0;
+              age[y][x] = alive ? Math.min(6, age[y][x] + 1) : 0;
+            }
+          }
+          state.grid = next;
+
+          let out = '';
+          for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+              const a = age[y][x];
+              out += a === 0 ? ' ' : a === 1 ? '@' : a <= 3 ? '▪' : '·';
+            }
+            if (y < rows - 1) out += '\n';
+          }
+          return out;
+        },
+      },
+
+      // 15. HYPERSPACE TUNNEL
+      {
+        id: 'hyperspace-tunnel',
+        title: 'Hyperspace Tunnel',
+        tag: 'WARP CORRIDOR',
+        cols: 36,
+        rows: 17,
+        fps: 24,
+        interactive: false,
+        description:
+          'Infinite perspective-projected tunnel walls rushing toward the viewer using reciprocal radius (1/r) depth mapping and angular ribs.',
+        code: `// Reciprocal-radius infinite perspective tunnel
+const depth = 16 / (r + 0.35) + t * 4.5;
+const rib = Math.sin(depth * 1.4) + Math.cos(theta * 6 + t);
+const ch = ramp[Math.floor(norm * (ramp.length - 1))];`,
+        render(t, state, pointer, cols, rows) {
+          const ramp = ' .·:-=+*#%@';
+          const cx = (cols - 1) / 2 + Math.sin(t * 0.9) * 2.5;
+          const cy = (rows - 1) / 2 + Math.cos(t * 0.7) * 1.4;
+          let out = '';
+
+          for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+              const dx = (x - cx) * 0.54;
+              const dy = y - cy;
+              const r = Math.hypot(dx, dy);
+              if (r < 0.9) {
+                out += ' ';
+                continue;
+              }
+              const theta = Math.atan2(dy, dx);
+              const depth = 14 / (r + 0.3) - t * 4.2;
+              const rings = Math.sin(depth * 1.5);
+              const spokes = Math.cos(theta * 6 + Math.sin(t * 0.8) * 1.5);
+              const val = (rings * 0.65 + spokes * 0.35 + 1) * 0.5;
+              const fog = Math.min(1, r / 4.2);
+              const idx = Math.max(0, Math.min(ramp.length - 1, Math.floor(val * fog * ramp.length)));
+              out += ramp[idx];
+            }
+            if (y < rows - 1) out += '\n';
+          }
+          return out;
+        },
+      },
+
+      // 16. PENDULUM WAVE
+      {
+        id: 'pendulum-wave',
+        title: 'Pendulum Wave',
+        tag: 'HARMONIC PHASE',
+        cols: 36,
+        rows: 16,
+        fps: 24,
+        interactive: false,
+        description:
+          'Sixteen coupled pendulums with linearly stepped frequencies drift in and out of phase, cycling through traveling waves, double helices, and synchronized alignments.',
+        code: `// Coupled pendulum array with stepped angular frequencies
+const freq = 1.6 + row * 0.14;
+const xPos = cx + Math.sin(t * freq) * amp;
+// Draw pivot tether '·' and bob '@'`,
+        render(t, state, pointer, cols, rows) {
+          const cx = (cols - 1) / 2;
+          const amp = cols * 0.41;
+          let out = '';
+
+          for (let y = 0; y < rows; y++) {
+            const row = Array(cols).fill(' ');
+            const freq = 1.45 + y * 0.14;
+            const phase = Math.sin(t * freq);
+            const vel = Math.cos(t * freq);
+            const pos = Math.round(cx + phase * amp);
+            const center = Math.round(cx);
+
+            const lo = Math.min(center, pos);
+            const hi = Math.max(center, pos);
+            for (let x = lo; x <= hi; x++) {
+              if (x >= 0 && x < cols) row[x] = '─';
+            }
+            row[center] = '│';
+            if (pos >= 0 && pos < cols) {
+              row[pos] = Math.abs(vel) > 0.65 ? '@' : 'O';
+            }
+
+            out += row.join('');
+            if (y < rows - 1) out += '\n';
+          }
+          return out;
+        },
+      },
+
+      // 17. FLOCKING BOIDS
+      {
+        id: 'flocking-boids',
+        title: 'Flocking Boids',
+        tag: 'SWARM AI',
+        cols: 36,
+        rows: 16,
+        fps: 18,
+        interactive: true,
+        init(state, cols, rows) {
+          state.boids = Array.from({ length: 24 }, () => {
+            const angle = Math.random() * Math.PI * 2;
+            return {
+              x: Math.random() * cols,
+              y: Math.random() * rows,
+              vx: Math.cos(angle) * 0.55,
+              vy: Math.sin(angle) * 0.35,
+            };
+          });
+        },
+        description:
+          'Directional ASCII arrows (> < ^ v) steer via Craig Reynolds’ separation, alignment, and cohesion rules. Hover to attract the swarm toward your cursor.',
+        code: `// Boids steering: separation + alignment + cohesion
+b.vx += sepX * 0.08 + aliX * 0.05 + cohX * 0.01;
+b.vy += sepY * 0.08 + aliY * 0.05 + cohY * 0.01;
+// Pick directional glyph from atan2(vy, vx)`,
+        render(t, state, pointer, cols, rows) {
+          const boids = state.boids;
+          const grid = Array.from({ length: rows }, () => Array(cols).fill(' '));
+
+          for (let i = 0; i < boids.length; i++) {
+            const b = boids[i];
+            let sepX = 0, sepY = 0;
+            let aliX = 0, aliY = 0;
+            let cohX = 0, cohY = 0;
+            let count = 0;
+
+            for (let j = 0; j < boids.length; j++) {
+              if (i === j) continue;
+              const o = boids[j];
+              const dx = o.x - b.x;
+              const dy = o.y - b.y;
+              const d = Math.hypot(dx * 0.6, dy);
+              if (d < 6.5 && d > 0.01) {
+                aliX += o.vx;
+                aliY += o.vy;
+                cohX += o.x;
+                cohY += o.y;
+                count++;
+                if (d < 2.2) {
+                  sepX -= dx / d;
+                  sepY -= dy / d;
+                }
+              }
+            }
+
+            if (count > 0) {
+              b.vx += (aliX / count - b.vx) * 0.06 + (cohX / count - b.x) * 0.006;
+              b.vy += (aliY / count - b.vy) * 0.06 + (cohY / count - b.y) * 0.006;
+            }
+            b.vx += sepX * 0.07;
+            b.vy += sepY * 0.07;
+
+            if (pointer.active) {
+              const tx = pointer.x * cols;
+              const ty = pointer.y * rows;
+              b.vx += (tx - b.x) * 0.012;
+              b.vy += (ty - b.y) * 0.012;
+            }
+
+            const speed = Math.hypot(b.vx, b.vy) || 0.01;
+            const maxSpd = 0.72;
+            const minSpd = 0.28;
+            if (speed > maxSpd) {
+              b.vx = (b.vx / speed) * maxSpd;
+              b.vy = (b.vy / speed) * maxSpd;
+            } else if (speed < minSpd) {
+              b.vx = (b.vx / speed) * minSpd;
+              b.vy = (b.vy / speed) * minSpd;
+            }
+
+            b.x = (b.x + b.vx + cols) % cols;
+            b.y = (b.y + b.vy + rows) % rows;
+
+            const gx = Math.floor(b.x);
+            const gy = Math.floor(b.y);
+            const ang = Math.atan2(b.vy, b.vx);
+            let glyph = '>';
+            if (ang > -Math.PI / 4 && ang <= Math.PI / 4) glyph = '>';
+            else if (ang > Math.PI / 4 && ang <= (3 * Math.PI) / 4) glyph = 'v';
+            else if (ang <= -Math.PI / 4 && ang > (-3 * Math.PI) / 4) glyph = '^';
+            else glyph = '<';
+
+            if (gy >= 0 && gy < rows && gx >= 0 && gx < cols) {
+              grid[gy][gx] = glyph;
+            }
+          }
+
+          return grid.map((r) => r.join('')).join('\n');
+        },
+      },
+
+      // 18. SONAR SWEEP
+      {
+        id: 'sonar-sweep',
+        title: 'Sonar Sweep',
+        tag: 'RADAR BUFFER',
+        cols: 36,
+        rows: 17,
+        fps: 22,
+        interactive: false,
+        init(state) {
+          state.blips = [
+            { r: 3.6, a: 0.7 },
+            { r: 5.8, a: 2.4 },
+            { r: 4.5, a: 4.2 },
+            { r: 6.4, a: 5.3 },
+          ];
+        },
+        description:
+          'A sweeping monochrome radar beam rotates 360°, illuminating polar range rings and decaying phosphor target blips as the beam passes over them.',
+        code: `// Polar radar sweep with angular trail decay
+const diff = ((beamAngle - theta) % TWO_PI + TWO_PI) % TWO_PI;
+const trail = diff < 1.15 ? 1 - diff / 1.15 : 0;
+// Highlight target blips when beam passes overhead`,
+        render(t, state, pointer, cols, rows) {
+          const cx = (cols - 1) / 2;
+          const cy = (rows - 1) / 2;
+          const maxR = 7.4;
+          const TWO_PI = Math.PI * 2;
+          const beam = (t * 1.9) % TWO_PI;
+
+          let out = '';
+          for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+              const dx = (x - cx) * 0.54;
+              const dy = y - cy;
+              const r = Math.hypot(dx, dy);
+
+              if (r > maxR + 0.35) {
+                out += ' ';
+                continue;
+              }
+              if (r > maxR - 0.35) {
+                out += '·';
+                continue;
+              }
+
+              const theta = (Math.atan2(dy, dx) + TWO_PI) % TWO_PI;
+              const diff = (beam - theta + TWO_PI) % TWO_PI;
+
+              // Check target blips
+              let blipHit = false;
+              for (let i = 0; i < state.blips.length; i++) {
+                const b = state.blips[i];
+                const bx = Math.cos(b.a) * b.r;
+                const by = Math.sin(b.a) * b.r;
+                if (Math.hypot(dx - bx, dy - by) < 0.65) {
+                  const bDiff = (beam - b.a + TWO_PI) % TWO_PI;
+                  if (bDiff < 2.2) {
+                    out += bDiff < 0.6 ? '@' : '+';
+                    blipHit = true;
+                  }
+                  break;
+                }
+              }
+              if (blipHit) continue;
+
+              if (r < 0.55) {
+                out += '+';
+              } else if (diff < 0.14) {
+                out += '@';
+              } else if (diff < 0.45) {
+                out += '#';
+              } else if (diff < 0.85) {
+                out += ':';
+              } else if (diff < 1.25) {
+                out += '·';
+              } else if (Math.abs(r - 3.7) < 0.22) {
+                out += '.';
+              } else {
+                out += ' ';
+              }
+            }
+            if (y < rows - 1) out += '\n';
+          }
+          return out;
+        },
+      },
+    ];
+
+    // =========================================================================
+    // GALLERY ENGINE & DOM MOUNTING
+    // =========================================================================
+
+    let isPaused = false;
+    const cellControllers = [];
+    const mountedCards = [];
+    let currentColCount = 0;
+
+    function getMasonryColCount() {
+      const w = window.innerWidth;
+      if (w >= 1440) return 4;
+      if (w >= 1024) return 3;
+      if (w >= 640) return 2;
+      return 1;
+    }
+
+    /**
+     * Distributes mounted cards into flex masonry columns so that:
+     * - Card 0 (Name Streamer) is always top-left (Column 0)
+     * - Card 1 (CLICK ME LinkedIn) is always directly to its right (Column 1) on >=2 cols
+     * - Remaining cards flow organically across columns to balance masonry heights
+     */
+    function layoutMasonry(force = false) {
+      const grid = document.getElementById('masonry-grid');
+      if (!grid || mountedCards.length === 0) return;
+
+      const numCols = getMasonryColCount();
+      if (!force && numCols === currentColCount) return;
+      currentColCount = numCols;
+
+      const cols = Array.from({ length: numCols }, () => {
+        const colEl = document.createElement('div');
+        colEl.className = 'masonry-col';
+        return colEl;
+      });
+      const colHeights = new Array(numCols).fill(0);
+
+      mountedCards.forEach((entry, idx) => {
+        let targetCol = 0;
+        if (idx === 0) {
+          targetCol = 0;
+        } else if (idx === 1 && numCols >= 2) {
+          targetCol = 1;
+        } else if (idx < numCols) {
+          targetCol = idx;
+        } else {
+          // Pick shortest estimated column for organic masonry balance
+          let minH = colHeights[0];
+          targetCol = 0;
+          for (let c = 1; c < numCols; c++) {
+            if (colHeights[c] < minH) {
+              minH = colHeights[c];
+              targetCol = c;
+            }
+          }
+        }
+        cols[targetCol].appendChild(entry.card);
+        colHeights[targetCol] += entry.estHeight;
+      });
+
+      grid.innerHTML = '';
+      cols.forEach((colEl) => grid.appendChild(colEl));
+    }
+
+    function updateStatusReadout() {
+      const el = document.getElementById('status-readout');
+      if (!el) return;
+      const total = EFFECTS.length;
+      const activeCount = isPaused
+        ? 0
+        : cellControllers.filter((c) => !c.showingInfo).length;
+      el.textContent = isPaused
+        ? `PAUSED: 0 / ${total}`
+        : `ACTIVE: ${activeCount} / ${total}`;
+    }
+
+    function mountGallery() {
+      const grid = document.getElementById('masonry-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      mountedCards.length = 0;
+
+      EFFECTS.forEach((effect) => {
+        const card = document.createElement('article');
+        card.className = 'masonry-item';
+        card.dataset.id = effect.id;
+
+        const state = {};
+        if (typeof effect.init === 'function') {
+          effect.init(state, effect.cols, effect.rows);
+        }
+
+        const pointer = { active: false, x: 0.5, y: 0.5 };
+
+        // Top-right 'i' button
+        const infoBtn = document.createElement('button');
+        infoBtn.type = 'button';
+        infoBtn.className = 'info-btn';
+        infoBtn.setAttribute('aria-label', `Toggle info and code for ${effect.title}`);
+        infoBtn.textContent = 'i';
+
+        // Subtle top-left title label
+        const headerBadge = document.createElement('div');
+        headerBadge.className =
+          'absolute top-2.5 left-3 z-10 flex items-center gap-2 pointer-events-none';
+        headerBadge.innerHTML = `
+          <span class="font-mono text-[10px] tracking-widest uppercase text-[var(--text-secondary)]">${escapeHtml(effect.title)}</span>
+          <span class="font-mono text-[9px] px-1.5 py-0.5 rounded border border-[var(--border-subtle)] text-[var(--text-muted)]">${escapeHtml(effect.tag)}</span>
+        `;
+
+        // ASCII Stage
+        const stage = document.createElement('div');
+        stage.className = `ascii-stage${effect.interactive ? ' interactive-stage' : ''}${
+          effect.clickableLink ? ' clickable-stage' : ''
+        }`;
+
+        const pre = document.createElement('pre');
+        pre.className = 'ascii-pre';
+        stage.appendChild(pre);
+
+        // Clickable link launcher for clickableLink cells
+        if (effect.clickableLink) {
+          stage.setAttribute('role', 'link');
+          stage.setAttribute('tabindex', '0');
+          stage.setAttribute('title', 'Click to open link');
+
+          const launchLink = () => {
+            const val = (state.text || '').trim();
+            if (!val) {
+              showToast('Enter a link or text first');
+              return;
+            }
+            const isFullUrl = /^https?:\/\//i.test(val);
+            const looksLikeDomain = /^[\w-]+(\.[\w-]+)+([/?#].*)?$/i.test(val);
+            if (isFullUrl || looksLikeDomain) {
+              const targetUrl = isFullUrl ? val : `https://${val}`;
+              window.open(targetUrl, '_blank', 'noopener,noreferrer');
+              showToast(`Opening ${targetUrl}`);
+            } else {
+              copyTextToClipboard(val);
+              showToast(`Clicked: "${val}" (copied)`);
+            }
+          };
+
+          stage.addEventListener('click', launchLink);
+          stage.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              launchLink();
+            }
+          });
+        }
+
+        // Info / Code Overlay Panel
+        const infoPanel = document.createElement('div');
+        infoPanel.className = 'info-panel';
+        const inspLinkHtml = effect.inspirationUrl
+          ? `<a href="${escapeHtml(effect.inspirationUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 mt-1.5 font-mono text-[10px] underline underline-offset-2 text-[var(--text-primary)] hover:opacity-80">INSPIRED BY ${escapeHtml(effect.inspirationLabel || effect.inspirationUrl)} ↗</a>`
+          : '';
+        infoPanel.innerHTML = `
+          <div class="pr-8 mb-2.5">
+            <div class="flex items-center gap-2 mb-1">
+              <h2 class="font-mono text-xs font-semibold uppercase tracking-wider text-[var(--text-primary)]">${escapeHtml(effect.title)}</h2>
+              <span class="font-mono text-[9px] px-1.5 py-0.5 rounded border border-[var(--border-subtle)] text-[var(--text-muted)]">${escapeHtml(effect.tag)}</span>
+            </div>
+            <p class="text-[11px] leading-relaxed text-[var(--text-secondary)]">${escapeHtml(effect.description)}</p>
+            ${inspLinkHtml}
+          </div>
+          <div class="flex-1 min-h-0 flex flex-col border border-[var(--border-subtle)] rounded-lg bg-[var(--bg-page)] overflow-hidden">
+            <div class="flex items-center justify-between px-2.5 py-1.5 border-b border-[var(--border-subtle)]">
+              <span class="font-mono text-[10px] text-[var(--text-muted)]">ALGORITHM.JS</span>
+              <button type="button" class="copy-code-btn font-mono text-[10px] px-2 py-0.5 rounded border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--text-primary)] transition-colors cursor-pointer">
+                COPY
+              </button>
+            </div>
+            <pre class="code-scroll flex-1 overflow-auto p-2.5 font-mono text-[10px] leading-relaxed text-[var(--text-primary)] m-0">${escapeHtml(effect.code)}</pre>
+          </div>
+        `;
+
+        card.appendChild(headerBadge);
+        card.appendChild(infoBtn);
+        card.appendChild(stage);
+
+        // Optional Minimalist Inspiration Attribution Bar
+        if (effect.inspirationUrl) {
+          const attrBar = document.createElement('div');
+          attrBar.className = 'attribution-bar';
+          attrBar.innerHTML = `
+            <span class="font-mono text-[10px] tracking-widest uppercase text-[var(--text-muted)]">INSPIRATION</span>
+            <a
+              href="${escapeHtml(effect.inspirationUrl)}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="attribution-link"
+            >
+              ${escapeHtml(effect.inspirationLabel || effect.inspirationUrl)} ↗
+            </a>
+          `;
+          card.appendChild(attrBar);
+        }
+
+        // Optional Live Name Input Bar (for first cell)
+        if (effect.hasNameInput) {
+          const inputWrap = document.createElement('div');
+          inputWrap.className = 'name-input-wrap';
+          inputWrap.innerHTML = `
+            <span class="font-mono text-[11px] text-[var(--text-muted)] select-none">&gt;_</span>
+            <input
+              type="text"
+              class="name-input"
+              value="${escapeHtml(state.text)}"
+              maxlength="32"
+              placeholder="TYPE YOUR NAME..."
+              aria-label="Type your name to animate in ASCII"
+              spellcheck="false"
+              autocomplete="off"
+            />
+          `;
+          const inputEl = inputWrap.querySelector('input');
+          inputEl.addEventListener('input', (e) => {
+            state.text = e.target.value;
+          });
+          card.appendChild(inputWrap);
+        }
+
+        // Optional Distinct Pill Link Input Bar (for CLICK ME cell)
+        if (effect.hasLinkInput) {
+          const linkWrap = document.createElement('div');
+          linkWrap.className = 'link-input-wrap';
+          linkWrap.innerHTML = `
+            <div class="link-input-pill">
+              <span class="font-mono text-[11px] text-[var(--text-secondary)] select-none">↗</span>
+              <input
+                type="text"
+                class="link-input"
+                value="${escapeHtml(state.text)}"
+                maxlength="120"
+                placeholder="Paste any URL or text..."
+                aria-label="Enter any URL or text to make the animation clickable"
+                spellcheck="false"
+                autocomplete="off"
+              />
+            </div>
+          `;
+          const linkInputEl = linkWrap.querySelector('input');
+          linkInputEl.addEventListener('input', (e) => {
+            state.text = e.target.value;
+          });
+          card.appendChild(linkWrap);
+        }
+
+        card.appendChild(infoPanel);
+        const estHeight =
+          effect.rows + (effect.hasNameInput || effect.hasLinkInput || effect.inspirationUrl ? 4 : 0);
+        mountedCards.push({ card, estHeight });
+
+        // Controller object for animation loop
+        const controller = {
+          effect,
+          state,
+          pointer,
+          pre,
+          lastFrame: 0,
+          showingInfo: false,
+        };
+        cellControllers.push(controller);
+
+        // Toggle 'i' Info / Code Panel
+        infoBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          controller.showingInfo = !controller.showingInfo;
+          card.classList.toggle('show-info', controller.showingInfo);
+          infoBtn.textContent = controller.showingInfo ? '×' : 'i';
+          updateStatusReadout();
+        });
+
+        // Copy snippet button
+        const copyBtn = infoPanel.querySelector('.copy-code-btn');
+        if (copyBtn) {
+          copyBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            copyTextToClipboard(effect.code);
+          });
+        }
+
+        // Interactive pointer events (mouse + touch)
+        if (effect.interactive) {
+          const updatePointer = (clientX, clientY) => {
+            const rect = stage.getBoundingClientRect();
+            pointer.x = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+            pointer.y = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+            pointer.active = true;
+          };
+
+          stage.addEventListener('mousemove', (e) => updatePointer(e.clientX, e.clientY));
+          stage.addEventListener('mouseleave', () => {
+            pointer.active = false;
+          });
+          stage.addEventListener(
+            'touchstart',
+            (e) => {
+              if (e.touches.length > 0) {
+                updatePointer(e.touches[0].clientX, e.touches[0].clientY);
+              }
+            },
+            { passive: true }
+          );
+          stage.addEventListener(
+            'touchmove',
+            (e) => {
+              if (e.touches.length > 0) {
+                e.preventDefault();
+                updatePointer(e.touches[0].clientX, e.touches[0].clientY);
+              }
+            },
+            { passive: false }
+          );
+          stage.addEventListener('touchend', () => {
+            pointer.active = false;
+          });
+        }
+      });
+
+      layoutMasonry(true);
+      updateStatusReadout();
+    }
+
+    // =========================================================================
+    // MAIN ANIMATION LOOP
+    // =========================================================================
+
+    let startTime = 0;
+
+    function animate(now) {
+      if (!startTime) startTime = now;
+      const elapsedSec = (now - startTime) * 0.001;
+
+      if (!isPaused) {
+        for (let i = 0; i < cellControllers.length; i++) {
+          const c = cellControllers[i];
+          if (c.showingInfo) continue;
+
+          const frameInterval = 1000 / c.effect.fps;
+          if (now - c.lastFrame >= frameInterval) {
+            c.lastFrame = now;
+            try {
+              const output = c.effect.render(
+                elapsedSec,
+                c.state,
+                c.pointer,
+                c.effect.cols,
+                c.effect.rows
+              );
+              c.pre.innerHTML = c.effect.isHtml ? output : shadeAscii(output);
+            } catch (err) {
+              c.pre.textContent = '[RENDER ERROR]';
+            }
+          }
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    // =========================================================================
+    // HEADER CONTROLS & BOOTSTRAP
+    // =========================================================================
+
+    window.onload = function () {
+      mountGallery();
+      window.addEventListener('resize', () => layoutMasonry(false));
+
+      const btnPause = document.getElementById('btn-pause');
+      const pauseIcon = document.getElementById('pause-icon');
+      const pauseLabel = document.getElementById('pause-label');
+
+      if (btnPause) {
+        btnPause.addEventListener('click', () => {
+          isPaused = !isPaused;
+          pauseIcon.textContent = isPaused ? '▶' : '❚❚';
+          pauseLabel.textContent = isPaused ? 'PLAY' : 'PAUSE';
+          updateStatusReadout();
+        });
+      }
+
+      const btnTheme = document.getElementById('btn-theme');
+      if (btnTheme) {
+        btnTheme.addEventListener('click', () => {
+          document.documentElement.classList.toggle('light-mono');
+        });
+      }
+
+      requestAnimationFrame(animate);
+    };
+  </script>
+</body>
+</html>
